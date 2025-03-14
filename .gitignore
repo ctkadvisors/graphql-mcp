@@ -1,0 +1,83 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+lib/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# TypeScript cache
+*.tsbuildinfo
+.tscache/
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# Environment and config files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Cache directories
+.npm
+.eslintcache
+.cache/
+.parcel-cache/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# IDE and editor directories
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# AWS CDK
+.cdk.staging/
+cdk.out/
+
+# Optional: Add specific project files if needed
+# lambda-mcp-*.tgz
+
+# Serverless directories
+.serverless/
+
+# Docker
+.dockerignore
+
+# Local development files
+sample.env.*.local
+.env.*.local
+.env.development

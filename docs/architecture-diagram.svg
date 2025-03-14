@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" rx="10" ry="10" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">Lambda-MCP Architecture</text>
+  
+  <!-- AWS Cloud -->
+  <rect x="50" y="80" width="700" height="470" fill="#F7F7F7" stroke="#232F3E" stroke-width="2" rx="10" ry="10" />
+  <text x="120" y="110" font-family="Arial" font-size="16" font-weight="bold">AWS Cloud</text>
+  
+  <!-- LLM Box (External) -->
+  <rect x="50" y="150" width="200" height="100" fill="#E6F7FF" stroke="#1890FF" stroke-width="2" rx="5" ry="5" />
+  <text x="150" y="180" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Any Tool-Enabled LLM</text>
+  <text x="150" y="205" font-family="Arial" font-size="12" text-anchor="middle">(Claude, GPT, etc.)</text>
+  <text x="150" y="230" font-family="Arial" font-size="12" text-anchor="middle">MCP Client</text>
+  
+  <!-- API Gateway -->
+  <rect x="320" y="150" width="160" height="60" fill="#FF9900" stroke="#232F3E" stroke-width="2" rx="5" ry="5" />
+  <text x="400" y="185" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">API Gateway</text>
+  
+  <!-- Lambda Core -->
+  <rect x="250" y="250" width="300" height="250" fill="#FFFFFF" stroke="#232F3E" stroke-width="2" rx="5" ry="5" />
+  <text x="400" y="275" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Lambda-MCP Core</text>
+  
+  <!-- Transport Layer -->
+  <rect x="270" y="290" width="260" height="60" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2" rx="5" ry="5" />
+  <text x="400" y="325" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">MCP Transport Layer</text>
+  
+  <!-- Protocol Handler -->
+  <rect x="270" y="360" width="260" height="60" fill="#E3F2FD" stroke="#1565C0" stroke-width="2" rx="5" ry="5" />
+  <text x="400" y="395" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">MCP Protocol Handler</text>
+  
+  <!-- Tool Registry -->
+  <rect x="270" y="430" width="260" height="60" fill="#FFF3E0" stroke="#E65100" stroke-width="2" rx="5" ry="5" />
+  <text x="400" y="465" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Tool Registry</text>
+  
+  <!-- Tool Implementations -->
+  <rect x="600" y="250" width="140" height="250" fill="#FFFFFF" stroke="#232F3E" stroke-width="2" rx="5" ry="5" />
+  <text x="670" y="275" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Tool Implementations</text>
+  
+  <!-- GraphQL Tool -->
+  <rect x="610" y="290" width="120" height="50" fill="#F3E5F5" stroke="#6A1B9A" stroke-width="2" rx="5" ry="5" />
+  <text x="670" y="320" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">GraphQL</text>
+  
+  <!-- Elasticsearch Tool -->
+  <rect x="610" y="350" width="120" height="50" fill="#FBE9E7" stroke="#BF360C" stroke-width="2" rx="5" ry="5" />
+  <text x="670" y="380" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Elasticsearch</text>
+  
+  <!-- Custom Tool -->
+  <rect x="610" y="410" width="120" height="50" fill="#E0F7FA" stroke="#006064" stroke-width="2" rx="5" ry="5" />
+  <text x="670" y="440" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Custom Tools</text>
+  
+  <!-- External APIs -->
+  <rect x="600" y="530" width="140" height="60" fill="#FFFDE7" stroke="#F57F17" stroke-width="2" rx="5" ry="5" />
+  <text x="670" y="560" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">External APIs</text>
+  <text x="670" y="575" font-family="Arial" font-size="12" text-anchor="middle">(Data Sources)</text>
+  
+  <!-- Connections -->
+  <!-- LLM to API Gateway -->
+  <line x1="250" y1="200" x2="320" y2="180" stroke="#232F3E" stroke-width="2" />
+  <polygon points="315,180 325,180 320,190" fill="#232F3E" />
+  <text x="290" y="175" font-family="Arial" font-size="12">MCP Protocol</text>
+  
+  <!-- API Gateway to Lambda -->
+  <line x1="400" y1="210" x2="400" y2="250" stroke="#232F3E" stroke-width="2" />
+  <polygon points="395,245 405,245 400,255" fill="#232F3E" />
+  
+  <!-- Lambda Core to Tool Implementations - Wrapper relationship -->
+  <path d="M 530,375 Q 550,375 570,375 Q 590,375 590,320 Q 590,290 609,290" fill="none" stroke="#232F3E" stroke-width="2" />
+  <polygon points="604,285 614,290 604,295" fill="#232F3E" />
+  
+  <path d="M 530,375 Q 550,375 570,375 Q 590,375 590,350 Q 590,350 609,350" fill="none" stroke="#232F3E" stroke-width="2" />
+  <polygon points="604,345 614,350 604,355" fill="#232F3E" />
+  
+  <path d="M 530,375 Q 550,375 570,375 Q 590,375 590,410 Q 590,410 609,410" fill="none" stroke="#232F3E" stroke-width="2" />
+  <polygon points="604,405 614,410 604,415" fill="#232F3E" />
+  
+  <!-- Tool Registry to All Tools Relationship -->
+  <path d="M 400,490 Q 400,510 550,510 Q 670,510 670,470" fill="none" stroke="#232F3E" stroke-width="2" stroke-dasharray="5,5" />
+  <polygon points="665,475 675,475 670,465" fill="#232F3E" />
+  <text x="510" y="530" font-family="Arial" font-size="12" text-anchor="middle">Tool Registration</text>
+  
+  <!-- Tool to External APIs -->
+  <line x1="670" y1="470" x2="670" y2="530" stroke="#232F3E" stroke-width="2" />
+  <polygon points="665,525 675,525 670,535" fill="#232F3E" />
+  
+  <!-- CDK Deployment -->
+  <rect x="50" y="530" width="160" height="60" fill="#EDE7F6" stroke="#4527A0" stroke-width="2" rx="5" ry="5" />
+  <text x="130" y="560" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">AWS CDK</text>
+  <text x="130" y="575" font-family="Arial" font-size="12" text-anchor="middle">Infrastructure Deployment</text>
+  
+  <!-- Wrapper Label -->
+  <text x="560" y="340" font-family="Arial" font-size="12" text-anchor="middle" fill="#232F3E" font-style="italic">Transport Wrapper</text>
+</svg>

@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Local Server",
+      "program": "${workspaceFolder}/dist/scripts/local-server.js",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env.development"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug with TS-Node",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--require", "ts-node/register",
+        "${workspaceFolder}/scripts/local-server.ts"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "envFile": "${workspaceFolder}/.env.development"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Mock Client",
+      "program": "${workspaceFolder}/scripts/mock-mcp-client.ts",
+      "runtimeArgs": [
+        "--require", "ts-node/register"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "envFile": "${workspaceFolder}/.env.development"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "graphql": {
+      "command": "node",
+      "args": ["/absolute/path/to/dist/graphql-mcp-server.js"],
+      "env": {
+        "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com/graphql",
+        "GRAPHQL_API_KEY": "",
+        "DEBUG": "true"
+      }
+    }
+  }
+}
