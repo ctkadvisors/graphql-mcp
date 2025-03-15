@@ -7,6 +7,7 @@ A strongly-typed TypeScript Model Context Protocol (MCP) server that provides se
 - **Strongly Typed**: Built with TypeScript for improved code quality and type safety
 - **Dynamic GraphQL Integration**: Connect to any GraphQL API with automatic tool generation
 - **Schema Introspection**: Automatically discovers and exposes all GraphQL operations as tools
+- **Query Whitelisting**: Optional whitelisting to control which GraphQL queries are exposed
 - **Rich Type Support**: Properly handles complex GraphQL types, input objects, and variables
 - **MCP Standard Compliant**: Follows the Model Context Protocol format for seamless Claude integration
 - **Smart Query Generation**: Builds efficient GraphQL queries with proper field selection
@@ -90,7 +91,8 @@ Add this server to your Claude Desktop configuration:
          "args": ["/absolute/path/to/dist/graphql-mcp-server.js"],
          "env": {
            "GRAPHQL_API_ENDPOINT": "https://your-graphql-api.com/graphql",
-           "GRAPHQL_API_KEY": "your-api-key-if-needed"
+           "GRAPHQL_API_KEY": "your-api-key-if-needed",
+           "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]"
          }
        }
      }
@@ -100,6 +102,51 @@ Add this server to your Claude Desktop configuration:
 3. Restart Claude Desktop to connect to the server
 
 You should now see GraphQL operations as available tools in Claude Desktop!
+
+### Query Whitelisting
+
+For security or performance reasons, you may want to limit which GraphQL queries are exposed to Claude. You can use the `WHITELISTED_QUERIES` environment variable to specify which queries should be available:
+
+```json
+"env": {
+  "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com/graphql",
+  "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]"
+}
+```
+
+The whitelist can be specified in two formats:
+- As a JSON array string (shown above): `"[\"query1\",\"query2\"]"` 
+- As a comma-separated list: `"query1,query2,query3"`
+
+> **IMPORTANT**: The `WHITELISTED_QUERIES` value must be a string, not an actual JSON array object. Environment variables are always passed as strings, so you need to properly escape the quotes in the JSON string as shown above.
+
+**Example of correct format in Claude Desktop configuration**:
+
+```json
+"graphql-countries": {
+  "command": "node",
+  "args": [
+    "/Users/username/Projects/graphql-mcp/dist/graphql-mcp-server.js"
+  ],
+  "env": {
+    "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com",
+    "NODE_ENV": "development",
+    "DEBUG": "true",
+    "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"cities\"]"
+  }
+}
+```
+
+**Common mistake to avoid**:
+```json
+// INCORRECT - Will not work!
+"WHITELISTED_QUERIES": ["countries","continent","cities"]
+
+// CORRECT
+"WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"cities\"]"
+```
+
+If no whitelist is provided, all queries from the GraphQL schema will be available.
 
 ## Example Usage
 
@@ -123,6 +170,7 @@ For more detailed information, see:
 
 - [Getting Started Guide](./docs/GETTING_STARTED.md)
 - [Technical Documentation](./docs/TECHNICAL.md)
+- [Query Whitelist Documentation](./docs/QUERY_WHITELIST.md)
 - [Project Status](./docs/PROJECT_STATUS.md)
 
 ## Development

@@ -6,7 +6,8 @@
       "env": {
         "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com/graphql",
         "GRAPHQL_API_KEY": "",
-        "DEBUG": "true"
+        "DEBUG": "true",
+        "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]"
       }
     }
   }

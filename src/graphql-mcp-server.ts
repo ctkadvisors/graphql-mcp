@@ -89,6 +89,27 @@ const GRAPHQL_API_KEY: string = process.env.GRAPHQL_API_KEY || '';
 const DEBUG: boolean = process.env.DEBUG === 'true';
 const CACHE_TTL: number = 3600000; // 1 hour in milliseconds
 
+// Parse whitelisted queries from environment variable
+let WHITELISTED_QUERIES: string[] | null = null;
+if (process.env.WHITELISTED_QUERIES) {
+  try {
+    if (typeof process.env.WHITELISTED_QUERIES === 'string') {
+      // Try parsing as JSON array first
+      if (process.env.WHITELISTED_QUERIES.startsWith('[')) {
+        WHITELISTED_QUERIES = JSON.parse(process.env.WHITELISTED_QUERIES);
+      } else {
+        // Otherwise treat as comma-separated list
+        WHITELISTED_QUERIES = process.env.WHITELISTED_QUERIES.split(',').map(q => q.trim()).filter(Boolean);
+      }
+    }
+    log("info", `Loaded whitelist with ${WHITELISTED_QUERIES?.length || 0} queries`, { whitelist: WHITELISTED_QUERIES });
+  } catch (error) {
+    log("error", `Failed to parse WHITELISTED_QUERIES: ${error instanceof Error ? error.message : String(error)}`);
+    // If parsing fails, don't use a whitelist
+    WHITELISTED_QUERIES = null;
+  }
+}
+
 // Debug logging to stderr
 function log(level: string, message: string, data: LogData = {}): void {
   const timestamp = new Date().toISOString();
@@ -217,6 +238,13 @@ function getToolsFromSchema(schema: GraphQLSchema | null): MCPTool[] {
   
   // Process each query field as a potential tool
   for (const [fieldName, field] of Object.entries(fields)) {
+    // Skip fields that aren't in the whitelist (if a whitelist is provided)
+    if (WHITELISTED_QUERIES && !WHITELISTED_QUERIES.includes(fieldName)) {
+      if (DEBUG) {
+        log("debug", `Skipping field ${fieldName} - not in whitelist`);
+      }
+      continue;
+    }
     try {
       // Analyze arguments for the field
       const properties: Record<string, any> = {};
@@ -459,6 +487,11 @@ function processArguments(
 // Handle tool execution
 async function executeGraphQLTool(name: string, args: Record<string, any> | undefined): Promise<any> {
   try {
+    // Check if the tool is in the whitelist (if whitelist is enabled)
+    if (WHITELISTED_QUERIES && !WHITELISTED_QUERIES.includes(name)) {
+      throw new Error(`Tool '${name}' is not in the whitelist`);
+    }
+
     // Get the schema
     const schema = await fetchSchema();
     if (!schema) {
@@ -565,6 +598,7 @@ async function main(): Promise<void> {
     log("info", "GraphQL MCP Server starting...");
     log("info", `GraphQL API Endpoint: ${GRAPHQL_API_ENDPOINT}`);
     log("info", `API Key: ${GRAPHQL_API_KEY ? "Configured" : "Not configured"}`);
+    log("info", `Whitelist: ${WHITELISTED_QUERIES ? `Enabled (${WHITELISTED_QUERIES.length} queries)` : "Disabled (all queries allowed)"}`);
     
     // Set up readline interface for stdin/stdout
     const rl = readline.createInterface({
