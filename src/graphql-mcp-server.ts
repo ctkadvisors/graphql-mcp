@@ -143,7 +143,7 @@ if (process.env.WHITELISTED_MUTATIONS) {
     log(
       "info",
       `Loaded mutation whitelist with ${
-        WHITELISTED_MUTATIONS?.length || 0
+        (WHITELISTED_MUTATIONS && WHITELISTED_MUTATIONS.length) || 0
       } mutations`,
       { whitelist: WHITELISTED_MUTATIONS }
     );
@@ -172,7 +172,6 @@ let schemaCacheExpiry: number | null = null;
 
 // Map of truncated tool names to original field names
 let toolNameMappings: Record<string, string> = {};
-
 
 // Execute GraphQL query
 async function executeQuery(args: QueryExecutionArgs): Promise<any> {
@@ -388,13 +387,14 @@ function getToolsFromSchema(schema: GraphQLSchema | null): MCPTool[] {
       });
 
       // Create a tool for this field - Truncate name to 64 characters if needed
-      const truncatedName = fieldName.length > 64 ? fieldName.substring(0, 64) : fieldName;
-      
+      const truncatedName =
+        fieldName.length > 64 ? fieldName.substring(0, 64) : fieldName;
+
       // Store mapping from truncated to original name if truncation occurred
       if (truncatedName !== fieldName) {
         toolNameMappings[truncatedName] = fieldName;
       }
-      
+
       const tool: MCPTool = {
         name: truncatedName,
         description: field.description || `GraphQL ${fieldName} query`,
@@ -515,18 +515,21 @@ function getToolsFromMutationType(schema: GraphQLSchema | null): MCPTool[] {
       // Create a tool for this mutation field - Truncate name to 64 characters if needed
       let fullName = `mutation_${fieldName}`;
       let truncatedName = fullName;
-      
+
       if (fullName.length > 64) {
         // Truncate the fieldName part to make the full name fit in 64 chars
         // Keep the mutation_ prefix for clarity
         const prefixLength = "mutation_".length;
         const maxFieldNameLength = 64 - prefixLength;
-        truncatedName = `mutation_${fieldName.substring(0, maxFieldNameLength)}`;
-        
+        truncatedName = `mutation_${fieldName.substring(
+          0,
+          maxFieldNameLength
+        )}`;
+
         // Store mapping from truncated to original full name
         toolNameMappings[truncatedName] = fullName;
       }
-      
+
       const tool: MCPTool = {
         name: truncatedName,
         description: field.description || `GraphQL ${fieldName} mutation`,
@@ -729,7 +732,7 @@ async function executeGraphQLTool(
   try {
     // If this name is in our mapping, use the original field name
     const actualFieldName = toolNameMappings[name] || name;
-    
+
     // Check if the tool is in the whitelist (if whitelist is enabled)
     if (WHITELISTED_QUERIES && !WHITELISTED_QUERIES.includes(actualFieldName)) {
       throw new Error(`Tool '${actualFieldName}' is not in the whitelist`);
@@ -848,7 +851,7 @@ async function executeGraphQLMutation(
   try {
     // If this name is in our mapping, use the original field name
     const fullName = toolNameMappings[name] || name;
-    
+
     // Extract the actual mutation name (remove 'mutation_' prefix)
     const mutationName = fullName.replace(/^mutation_/, "");
 
@@ -1092,16 +1095,16 @@ async function main(): Promise<void> {
             log("debug", `Result structure for ${name}:`, {
               resultStructure: JSON.stringify(result),
             });
-            
+
             // Handle undefined and null values to prevent Zod validation errors
             const sanitizeValue = (obj: any): any => {
               if (obj === undefined || obj === null) {
                 return null;
               }
-              
-              if (typeof obj === 'object' && obj !== null) {
+
+              if (typeof obj === "object" && obj !== null) {
                 if (Array.isArray(obj)) {
-                  return obj.map(item => sanitizeValue(item));
+                  return obj.map((item) => sanitizeValue(item));
                 } else {
                   const newObj: Record<string, any> = {};
                   for (const [key, value] of Object.entries(obj)) {
@@ -1110,20 +1113,22 @@ async function main(): Promise<void> {
                   return newObj;
                 }
               }
-              
+
               return obj;
             };
-            
+
             // Sanitize the result to avoid Zod validation errors
-            const sanitizedResult = JSON.stringify(sanitizeValue(result), null, 2);
-            
+            const sanitizedResult = JSON.stringify(
+              sanitizeValue(result),
+              null,
+              2
+            );
+
             const response: JSONRPCResponse = {
               jsonrpc: "2.0",
               id,
               result: {
-                content: [
-                  { type: "text", text: sanitizedResult || "{}" },
-                ],
+                content: [{ type: "text", text: sanitizedResult || "{}" }],
               },
             };
             console.log(JSON.stringify(response));

@@ -53,7 +53,7 @@ if (process.env.WHITELISTED_MUTATIONS) {
                     .filter(Boolean);
             }
         }
-        log("info", `Loaded mutation whitelist with ${WHITELISTED_MUTATIONS?.length || 0} mutations`, { whitelist: WHITELISTED_MUTATIONS });
+        log("info", `Loaded mutation whitelist with ${(WHITELISTED_MUTATIONS && WHITELISTED_MUTATIONS.length) || 0} mutations`, { whitelist: WHITELISTED_MUTATIONS });
     }
     catch (error) {
         log("error", `Failed to parse WHITELISTED_MUTATIONS: ${error instanceof Error ? error.message : String(error)}`);
@@ -804,9 +804,9 @@ async function main() {
                             if (obj === undefined || obj === null) {
                                 return null;
                             }
-                            if (typeof obj === 'object' && obj !== null) {
+                            if (typeof obj === "object" && obj !== null) {
                                 if (Array.isArray(obj)) {
-                                    return obj.map(item => sanitizeValue(item));
+                                    return obj.map((item) => sanitizeValue(item));
                                 }
                                 else {
                                     const newObj = {};
@@ -824,9 +824,7 @@ async function main() {
                             jsonrpc: "2.0",
                             id,
                             result: {
-                                content: [
-                                    { type: "text", text: sanitizedResult || "{}" },
-                                ],
+                                content: [{ type: "text", text: sanitizedResult || "{}" }],
                             },
                         };
                         console.log(JSON.stringify(response));
