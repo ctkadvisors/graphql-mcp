@@ -1092,14 +1092,37 @@ async function main(): Promise<void> {
             log("debug", `Result structure for ${name}:`, {
               resultStructure: JSON.stringify(result),
             });
-
-            // Format response with content array containing a text element
+            
+            // Handle undefined and null values to prevent Zod validation errors
+            const sanitizeValue = (obj: any): any => {
+              if (obj === undefined || obj === null) {
+                return null;
+              }
+              
+              if (typeof obj === 'object' && obj !== null) {
+                if (Array.isArray(obj)) {
+                  return obj.map(item => sanitizeValue(item));
+                } else {
+                  const newObj: Record<string, any> = {};
+                  for (const [key, value] of Object.entries(obj)) {
+                    newObj[key] = sanitizeValue(value);
+                  }
+                  return newObj;
+                }
+              }
+              
+              return obj;
+            };
+            
+            // Sanitize the result to avoid Zod validation errors
+            const sanitizedResult = JSON.stringify(sanitizeValue(result), null, 2);
+            
             const response: JSONRPCResponse = {
               jsonrpc: "2.0",
               id,
               result: {
                 content: [
-                  { type: "text", text: JSON.stringify(result, null, 2) },
+                  { type: "text", text: sanitizedResult || "{}" },
                 ],
               },
             };
