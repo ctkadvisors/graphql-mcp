@@ -221,8 +221,8 @@ async function getRepoIdForStarTest(server: ChildProcess): Promise<string> {
     params: {
       name: 'repository',
       arguments: {
-        owner: 'octocat',
-        name: 'Hello-World'
+        owner: 'ctkadvisors',
+        name: 'project_tracker'
       }
     }
   };

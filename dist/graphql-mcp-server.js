@@ -70,6 +70,8 @@ function log(level, message, data = {}) {
 let schemaCache = null;
 let schemaFetchInProgress = false;
 let schemaCacheExpiry = null;
+// Map of truncated tool names to original field names
+let toolNameMappings = {};
 // Execute GraphQL query
 async function executeQuery(args) {
     try {
@@ -133,9 +135,10 @@ async function fetchSchema() {
         const schema = (0, graphql_1.buildClientSchema)(data);
         const duration = Date.now() - startTime;
         log("info", `Schema fetched successfully in ${duration}ms`);
-        // Cache the schema
+        // Cache the schema and reset the name mappings
         schemaCache = schema;
         schemaCacheExpiry = now + CACHE_TTL;
+        toolNameMappings = {}; // Reset mappings as schema might have changed
         return schema;
     }
     catch (error) {
@@ -240,9 +243,14 @@ function getToolsFromSchema(schema) {
                     required.push(arg.name);
                 }
             });
-            // Create a tool for this field
+            // Create a tool for this field - Truncate name to 64 characters if needed
+            const truncatedName = fieldName.length > 64 ? fieldName.substring(0, 64) : fieldName;
+            // Store mapping from truncated to original name if truncation occurred
+            if (truncatedName !== fieldName) {
+                toolNameMappings[truncatedName] = fieldName;
+            }
             const tool = {
-                name: fieldName,
+                name: truncatedName,
                 description: field.description || `GraphQL ${fieldName} query`,
                 inputSchema: {
                     type: "object",
@@ -340,9 +348,20 @@ function getToolsFromMutationType(schema) {
                     required.push(arg.name);
                 }
             });
-            // Create a tool for this mutation field
+            // Create a tool for this mutation field - Truncate name to 64 characters if needed
+            let fullName = `mutation_${fieldName}`;
+            let truncatedName = fullName;
+            if (fullName.length > 64) {
+                // Truncate the fieldName part to make the full name fit in 64 chars
+                // Keep the mutation_ prefix for clarity
+                const prefixLength = "mutation_".length;
+                const maxFieldNameLength = 64 - prefixLength;
+                truncatedName = `mutation_${fieldName.substring(0, maxFieldNameLength)}`;
+                // Store mapping from truncated to original full name
+                toolNameMappings[truncatedName] = fullName;
+            }
             const tool = {
-                name: `mutation_${fieldName}`, // Prefix with 'mutation_' to distinguish from queries
+                name: truncatedName,
                 description: field.description || `GraphQL ${fieldName} mutation`,
                 inputSchema: {
                     type: "object",
@@ -500,9 +519,11 @@ function processArguments(args, fieldArgs, schema) {
 // Handle tool execution
 async function executeGraphQLTool(name, args) {
     try {
+        // If this name is in our mapping, use the original field name
+        const actualFieldName = toolNameMappings[name] || name;
         // Check if the tool is in the whitelist (if whitelist is enabled)
-        if (WHITELISTED_QUERIES && !WHITELISTED_QUERIES.includes(name)) {
-            throw new Error(`Tool '${name}' is not in the whitelist`);
+        if (WHITELISTED_QUERIES && !WHITELISTED_QUERIES.includes(actualFieldName)) {
+            throw new Error(`Tool '${actualFieldName}' is not in the whitelist`);
         }
         // Get the schema
         const schema = await fetchSchema();
@@ -514,11 +535,11 @@ async function executeGraphQLTool(name, args) {
         if (!queryType) {
             throw new Error("Schema has no query type");
         }
-        // Get the field for this tool
+        // Get the field for this tool using the resolved field name
         const fields = queryType.getFields();
-        const field = fields[name];
+        const field = fields[actualFieldName];
         if (!field) {
-            throw new Error(`Unknown field: ${name}`);
+            throw new Error(`Unknown field: ${actualFieldName}`);
         }
         try {
             // Process input arguments
@@ -590,8 +611,10 @@ async function executeGraphQLTool(name, args) {
 // Handle mutation execution
 async function executeGraphQLMutation(name, args) {
     try {
+        // If this name is in our mapping, use the original field name
+        const fullName = toolNameMappings[name] || name;
         // Extract the actual mutation name (remove 'mutation_' prefix)
-        const mutationName = name.replace(/^mutation_/, "");
+        const mutationName = fullName.replace(/^mutation_/, "");
         // Check if the mutation is in the whitelist (if whitelist is enabled)
         if (WHITELISTED_MUTATIONS &&
             !WHITELISTED_MUTATIONS.includes(mutationName)) {
