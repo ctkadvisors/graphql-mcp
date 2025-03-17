@@ -13,6 +13,7 @@ const GRAPHQL_API_ENDPOINT = process.env.GRAPHQL_API_ENDPOINT ||
 const GRAPHQL_API_KEY = process.env.GRAPHQL_API_KEY || "";
 const DEBUG = process.env.DEBUG === "true";
 const CACHE_TTL = 3600000; // 1 hour in milliseconds
+const ENABLE_MUTATIONS = process.env.ENABLE_MUTATIONS === "true"; // Mutations are OFF by default
 // Parse whitelisted queries from environment variable
 let WHITELISTED_QUERIES = null;
 if (process.env.WHITELISTED_QUERIES) {
@@ -767,9 +768,10 @@ async function main() {
                     // Get schema (will use cache if available)
                     const schema = await fetchSchema();
                     const queryTools = getToolsFromSchema(schema);
-                    const mutationTools = getToolsFromMutationType(schema);
+                    // Only include mutations if they are enabled
+                    const mutationTools = ENABLE_MUTATIONS ? getToolsFromMutationType(schema) : [];
                     const allTools = [...queryTools, ...mutationTools];
-                    log("info", `Returning ${allTools.length} tools (${queryTools.length} queries, ${mutationTools.length} mutations)`);
+                    log("info", `Returning ${allTools.length} tools (${queryTools.length} queries, ${mutationTools.length} mutations${!ENABLE_MUTATIONS ? ' - mutations disabled' : ''})`);
                     const response = {
                         jsonrpc: "2.0",
                         id,
@@ -786,6 +788,20 @@ async function main() {
                     log("info", `Tool call: ${name}`, { args });
                     // Determine if this is a mutation or a query
                     const isMutation = name.startsWith("mutation_");
+                    // Check if mutations are enabled
+                    if (isMutation && !ENABLE_MUTATIONS) {
+                        log("error", `Mutation ${name} called but mutations are disabled`);
+                        const response = {
+                            jsonrpc: "2.0",
+                            id,
+                            error: {
+                                code: -32000,
+                                message: "Mutations are disabled. Set ENABLE_MUTATIONS=true to enable them.",
+                            },
+                        };
+                        console.log(JSON.stringify(response));
+                        return;
+                    }
                     // Get result from GraphQL tool execution
                     try {
                         let result;

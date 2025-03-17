@@ -132,11 +132,23 @@ You should now see GraphQL operations as available tools in Claude Desktop!
 
 ### Operation Whitelisting
 
-For security or performance reasons, you may want to limit which GraphQL operations (queries and mutations) are exposed to Claude. You can use the whitelisting environment variables to specify which operations should be available:
+For security or performance reasons, you may want to limit which GraphQL operations (queries and mutations) are exposed to Claude. There are two approaches to controlling access:
+
+1. **Enable/Disable Mutations**: By default, all mutations are disabled for security. To enable mutations:
 
 ```json
 "env": {
   "GRAPHQL_API_ENDPOINT": "https://example-graphql-api.com/graphql",
+  "ENABLE_MUTATIONS": "true"
+}
+```
+
+2. **Operation Whitelisting**: You can specify which specific operations should be available:
+
+```json
+"env": {
+  "GRAPHQL_API_ENDPOINT": "https://example-graphql-api.com/graphql",
+  "ENABLE_MUTATIONS": "true",
   "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]",
   "WHITELISTED_MUTATIONS": "[\"createUser\",\"updateProfile\"]"
 }
@@ -160,6 +172,7 @@ The whitelists can be specified in two formats:
     "GRAPHQL_API_ENDPOINT": "https://example-graphql-api.com/graphql",
     "NODE_ENV": "development",
     "DEBUG": "true",
+    "ENABLE_MUTATIONS": "true",
     "WHITELISTED_QUERIES": "[\"getUser\",\"getProducts\",\"getOrders\"]",
     "WHITELISTED_MUTATIONS": "[\"createOrder\",\"updateProfile\"]"
   }
