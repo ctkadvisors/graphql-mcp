@@ -33,7 +33,6 @@ The TypeScript implementation provides significant benefits over the previous Ja
 
 ## Known Limitations
 
-- **Mutation Support**: Limited support for GraphQL mutations
 - **Authentication Methods**: Currently only supports Bearer token authentication
 - **Field Selection**: Uses a heuristic approach that may not be optimal for all schemas
 - **GraphQL Directives**: Limited support for GraphQL directives
@@ -42,7 +41,7 @@ The TypeScript implementation provides significant benefits over the previous Ja
 
 1. **Enhanced Authentication**: Support additional authentication methods
 2. **Schema Caching Options**: Add configurable caching strategies
-3. **Mutation Support**: Improve support for GraphQL mutations
+3. **Advanced Mutation Features**: Add support for complex mutation input types and recursive fragments
 4. **Testing Suite**: Develop comprehensive tests for different GraphQL APIs
 5. **API Documentation**: Generate API documentation from TypeScript types
 
