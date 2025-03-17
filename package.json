@@ -23,6 +23,7 @@
     "lint": "eslint src --ext .ts",
     "test:server": "ts-node test/test-server.ts",
     "test:github": "ts-node test/github-test.ts",
+    "test:mutations": "ts-node test/test-mutations.ts",
     "test": "npm run build && npm run test:server",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"

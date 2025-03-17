@@ -14,5 +14,5 @@ export DEBUG="true"
 echo "Compiling TypeScript..." >&2
 npx tsc
 
-# Start the server using the TypeScript implementation
-node src/graphql-mcp-server.js
+# Start the server
+node dist/graphql-mcp-server.js

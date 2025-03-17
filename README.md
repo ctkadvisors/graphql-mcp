@@ -7,7 +7,8 @@ A strongly-typed TypeScript Model Context Protocol (MCP) server that provides se
 - **Strongly Typed**: Built with TypeScript for improved code quality and type safety
 - **Dynamic GraphQL Integration**: Connect to any GraphQL API with automatic tool generation
 - **Schema Introspection**: Automatically discovers and exposes all GraphQL operations as tools
-- **Query Whitelisting**: Optional whitelisting to control which GraphQL queries are exposed
+- **Full Mutation Support**: First-class support for GraphQL mutations with proper handling
+- **Query & Mutation Whitelisting**: Optional whitelisting to control which GraphQL operations are exposed
 - **Rich Type Support**: Properly handles complex GraphQL types, input objects, and variables
 - **MCP Standard Compliant**: Follows the Model Context Protocol format for seamless Claude integration
 - **Smart Query Generation**: Builds efficient GraphQL queries with proper field selection
@@ -129,36 +130,38 @@ Add this server to your Claude Desktop configuration:
 
 You should now see GraphQL operations as available tools in Claude Desktop!
 
-### Query Whitelisting
+### Operation Whitelisting
 
-For security or performance reasons, you may want to limit which GraphQL queries are exposed to Claude. You can use the `WHITELISTED_QUERIES` environment variable to specify which queries should be available:
+For security or performance reasons, you may want to limit which GraphQL operations (queries and mutations) are exposed to Claude. You can use the whitelisting environment variables to specify which operations should be available:
 
 ```json
 "env": {
-  "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com/graphql",
-  "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]"
+  "GRAPHQL_API_ENDPOINT": "https://example-graphql-api.com/graphql",
+  "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"languages\"]",
+  "WHITELISTED_MUTATIONS": "[\"createUser\",\"updateProfile\"]"
 }
 ```
 
-The whitelist can be specified in two formats:
+The whitelists can be specified in two formats:
 - As a JSON array string (shown above): `"[\"query1\",\"query2\"]"` 
 - As a comma-separated list: `"query1,query2,query3"`
 
-> **IMPORTANT**: The `WHITELISTED_QUERIES` value must be a string, not an actual JSON array object. Environment variables are always passed as strings, so you need to properly escape the quotes in the JSON string as shown above.
+> **IMPORTANT**: The whitelist values must be strings, not actual JSON array objects. Environment variables are always passed as strings, so you need to properly escape the quotes in the JSON string as shown above.
 
 **Example of correct format in Claude Desktop configuration**:
 
 ```json
-"graphql-countries": {
+"graphql-api": {
   "command": "node",
   "args": [
     "/Users/username/Projects/graphql-mcp/dist/graphql-mcp-server.js"
   ],
   "env": {
-    "GRAPHQL_API_ENDPOINT": "https://countries.trevorblades.com",
+    "GRAPHQL_API_ENDPOINT": "https://example-graphql-api.com/graphql",
     "NODE_ENV": "development",
     "DEBUG": "true",
-    "WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"cities\"]"
+    "WHITELISTED_QUERIES": "[\"getUser\",\"getProducts\",\"getOrders\"]",
+    "WHITELISTED_MUTATIONS": "[\"createOrder\",\"updateProfile\"]"
   }
 }
 ```
@@ -166,15 +169,19 @@ The whitelist can be specified in two formats:
 **Common mistake to avoid**:
 ```json
 // INCORRECT - Will not work!
-"WHITELISTED_QUERIES": ["countries","continent","cities"]
+"WHITELISTED_QUERIES": ["getUser", "getProducts"],
+"WHITELISTED_MUTATIONS": ["createOrder", "updateProfile"]
 
 // CORRECT
-"WHITELISTED_QUERIES": "[\"countries\",\"continent\",\"cities\"]"
+"WHITELISTED_QUERIES": "[\"getUser\",\"getProducts\"]",
+"WHITELISTED_MUTATIONS": "[\"createOrder\",\"updateProfile\"]"
 ```
 
-If no whitelist is provided, all queries from the GraphQL schema will be available.
+If no whitelist is provided for a particular operation type, all operations of that type from the GraphQL schema will be available.
 
 ## Example Usage
+
+### Querying Data
 
 Once connected to Claude Desktop, you can use commands like:
 
@@ -190,6 +197,32 @@ View result from country from graphql (local){
 }
 ```
 
+### Using Mutations
+
+For mutations, the tools are prefixed with `mutation_` to distinguish them from queries:
+
+```
+View result from mutation_createUser from graphql (local){
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
+```
+
+Or a more complex mutation:
+
+```
+View result from mutation_updateProduct from graphql (local){
+  "id": "prod-123",
+  "input": {
+    "name": "Updated Product Name",
+    "price": 29.99,
+    "description": "This is an updated product description"
+  }
+}
+```
+
+Mutations follow the same pattern as queries but allow you to modify data in your GraphQL API.
+
 ## Documentation
 
 For more detailed information, see:
@@ -197,6 +230,7 @@ For more detailed information, see:
 - [Getting Started Guide](./docs/GETTING_STARTED.md)
 - [Technical Documentation](./docs/TECHNICAL.md)
 - [Query Whitelist Documentation](./docs/QUERY_WHITELIST.md)
+- [Mutations Documentation](./docs/MUTATIONS.md)
 - [Project Status](./docs/PROJECT_STATUS.md)
 
 ## Development
