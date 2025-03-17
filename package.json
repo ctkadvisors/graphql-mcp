@@ -59,7 +59,7 @@
     "apollo-server-express": "^3.13.0",
     "aws-cdk": "^2.103.1",
     "aws-cdk-lib": "^2.103.1",
-    "axios": "^1.6.2",
+    "axios": "^1.8.2",
     "concurrently": "^8.2.2",
     "constructs": "^10.3.0",
     "cross-env": "^7.0.3",
