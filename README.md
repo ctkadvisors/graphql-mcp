@@ -40,6 +40,32 @@ graphql-mcp/
 - Claude Desktop with MCP support
 - A GraphQL API endpoint (defaults to the Countries API if not specified)
 
+## Installation
+
+### Option 1: From npm
+
+```bash
+# Install globally
+npm install -g graphql-mcp
+
+# Run the server
+graphql-mcp-server
+```
+
+### Option 2: Clone Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/ctkadvisors/graphql-mcp.git
+cd graphql-mcp
+
+# Install dependencies
+npm install
+
+# Run the server
+npm start
+```
+
 ## Quick Start
 
 ### 1. Setup Environment Variables
@@ -180,6 +206,23 @@ To make changes to the server:
 1. Modify the TypeScript source in `src/graphql-mcp-server.ts`
 2. Compile the TypeScript code: `npm run build`
 3. Run the compiled server: `node dist/graphql-mcp-server.js`
+
+## Publishing to npm
+
+To publish this package to npm:
+
+```bash
+# Make sure you're logged in to npm
+npm login
+
+# Build the project
+npm run build
+
+# Publish to npm
+npm publish
+```
+
+The package will include the pre-built JavaScript files in the `dist` directory, making it ready to use without additional build steps.
 
 ## License
 
